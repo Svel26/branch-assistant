@@ -1,0 +1,159 @@
+{
+  "name": "branch-assistant",
+  "displayName": "Branch Assistant",
+  "description": "AI-powered Git branch name generator for Antigravity (Gemini) & VS Code (GitHub Copilot)",
+  "version": "0.1.0",
+  "publisher": "svenjansen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Svel26/branch-assistant"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "SCM Providers",
+    "AI",
+    "Other"
+  ],
+  "main": "./dist/extension.js",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "branch-assistant.createBranch",
+        "title": "Branch Assistant: Create Branch with AI...",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "branch-assistant.commitToNewBranch",
+        "title": "Branch Assistant: Commit to New Branch...",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "branch-assistant.generateBranchName",
+        "title": "Branch Assistant: Generate Branch Name for Active Changes",
+        "icon": "$(sparkle)"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "branch-assistant.createBranch",
+          "group": "navigation@1",
+          "when": "scmProvider == git"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "branch-assistant.createBranch"
+        },
+        {
+          "command": "branch-assistant.commitToNewBranch"
+        },
+        {
+          "command": "branch-assistant.generateBranchName"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Branch Assistant",
+      "properties": {
+        "branchAssistant.provider": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "copilot",
+            "gemini"
+          ],
+          "enumDescriptions": [
+            "Automatically detect: Use Gemini in Antigravity and GitHub Copilot in VS Code",
+            "Always use GitHub Copilot (via vscode.lm)",
+            "Always use Gemini"
+          ],
+          "default": "auto",
+          "description": "The AI provider used to generate branch names."
+        },
+        "branchAssistant.icon": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "sparkle",
+            "copilot"
+          ],
+          "enumDescriptions": [
+            "Auto-select: sparkle icon in Antigravity, copilot icon in VS Code",
+            "Always show the sparkle icon $(sparkle)",
+            "Always show the GitHub Copilot icon $(copilot)"
+          ],
+          "default": "auto",
+          "description": "Controls the icon displayed in the branch naming input box."
+        },
+        "branchAssistant.geminiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Optional Gemini API Key (if not using Antigravity internal auth or GEMINI_API_KEY environment variable)."
+        },
+        "branchAssistant.geminiModel": {
+          "type": "string",
+          "default": "gemini-2.5-flash",
+          "description": "Gemini model to use for branch name generation."
+        },
+        "branchAssistant.copilotModelFamily": {
+          "type": "string",
+          "default": "gpt-4o",
+          "description": "Preferred GitHub Copilot model family (e.g. gpt-4o, gpt-4o-mini)."
+        },
+        "branchAssistant.branchPrefix": {
+          "type": "string",
+          "default": "",
+          "description": "Custom branch prefix (e.g. 'feature/', 'user/sven/'). Leave empty to inherit from git.branchPrefix."
+        },
+        "branchAssistant.convention": {
+          "type": "string",
+          "enum": [
+            "conventional",
+            "short",
+            "custom"
+          ],
+          "enumDescriptions": [
+            "Conventional prefixes (feat/, fix/, chore/, refactor/, docs/, test/)",
+            "Short hyphenated name without prefix (e.g. jwt-auth-validation)",
+            "Custom pattern matching custom prompt"
+          ],
+          "default": "conventional",
+          "description": "Branch naming convention style."
+        },
+        "branchAssistant.interceptNativeGitPrompt": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically attach the generate button to VS Code's native Git branch naming input box (e.g. when committing to a protected branch or using status bar)."
+        },
+        "branchAssistant.populateCommitMessage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Keep the AI-generated commit message in the Source Control input box when generating a branch name. Set to false if you prefer the commit message box to remain clean."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "dev": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.90.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  }
+}
